@@ -26,7 +26,12 @@ public class MainActivity extends CordovaActivity {
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
-            setScreenOrientation();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setScreenOrientation();
+                }
+            });
         }
 
         public void startObserver() {
