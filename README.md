@@ -1,4 +1,4 @@
-**本应用用于安卓用户在本地阅读崩三的三部视觉小说，Windows端用户可下载app/src/main/assets/www下的所有文件并以以下方法打开进行阅读：**
+**本应用用于安卓用户在本地阅读崩三的三部视觉小说，Windows端用户可下载 https://github.com/Escosis/BH3-Visual-Novels 仓库的所有文件并以以下方法打开进行阅读：（也可以直接访问 https://escosis.github.io/BH3-Visual-Novels/ 进行预览。）**
 
 ## 方法一：在电脑浏览器中打开htm/html直接阅读，但需要禁用浏览器的CORS策略才可正常使用，否则将由于该策略限制无法访问资源文件。
 
