@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.Window;
 import android.content.pm.ActivityInfo;
 import android.view.Surface;
-
 import org.apache.cordova.CordovaActivity;
 
 public class MainActivity extends CordovaActivity {
@@ -27,7 +26,12 @@ public class MainActivity extends CordovaActivity {
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
-            setScreenOrientation();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setScreenOrientation();
+                }
+            });
         }
 
         public void startObserver() {
@@ -47,17 +51,14 @@ public class MainActivity extends CordovaActivity {
             int rotationEnabled = Settings.System.getInt(getContentResolver(),
                     Settings.System.ACCELEROMETER_ROTATION);
             if (rotationEnabled == 1) {
-                // 自动旋转开启：使用传感器横屏，可左右翻转
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
             } else {
-                // 自动旋转关闭：锁定为当前横屏方向（正向或反向），避免翻转
                 int currentRotation = getWindowManager().getDefaultDisplay().getRotation();
                 if (currentRotation == Surface.ROTATION_90) {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 } else if (currentRotation == Surface.ROTATION_270) {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
                 } else {
-                    // 如果当前不是横屏（理论上不会发生，因为应用横屏），则默认设为正向横屏
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 }
             }
@@ -94,6 +95,9 @@ public class MainActivity extends CordovaActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        if (mRotationObserver != null) {
+            mRotationObserver.stopObserver();
+        }
         if (appView != null) {
             String js = "javascript:(function() {" +
                     "var audios = document.querySelectorAll('audio');" +
@@ -104,13 +108,17 @@ public class MainActivity extends CordovaActivity {
                     "   }" +
                     "}" +
                     "})()";
-            appView.loadUrl(js);   // 直接使用 appView，不需要 getView()
+            appView.loadUrl(js);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (mRotationObserver != null) {
+            mRotationObserver.startObserver();
+            setScreenOrientation();
+        }
         if (appView != null) {
             String js = "javascript:(function() {" +
                     "var audios = document.querySelectorAll('audio');" +
